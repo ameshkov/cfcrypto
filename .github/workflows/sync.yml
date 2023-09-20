@@ -1,0 +1,25 @@
+name: Daily Sync
+
+on:
+  schedule:
+    # Run daily
+    - cron: '0 12 * * *'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run sync script
+        run: ./tools/sync.sh
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git diff --quiet && git diff --staged --quiet || git commit -m "Auto commit: Daily sync"
+          git push
